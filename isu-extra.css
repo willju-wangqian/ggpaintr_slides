@@ -1,0 +1,94 @@
+/* ===================================================================
+   isu-extra.css — custom ISU-style SECTION / DEMO divider slide.
+   Reuses the title-slide look: campus photo + 88% cardinal overlay,
+   centered white text, gold rule. Used by `.isu-section`.
+   Brand literals match _extensions/isu/isu.scss
+   (cardinal #C8102E / overlay rgba(200,16,46,.88) / gold #F1BE48).
+   =================================================================== */
+
+/* full-bleed: drop default slide padding, fill the canvas, center content */
+.reveal .slides section.isu-section {
+  padding: 0;
+  top: 0 !important;
+  height: 100%;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* the 88% cardinal overlay over the campus background image */
+.reveal section.isu-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: rgba(200, 16, 46, 0.88);
+}
+
+/* lift all content above the overlay */
+.reveal section.isu-section > * {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+/* hide the red footer bar + page number on divider/demo slides (as title/cover do).
+   Ancestor-agnostic + !important so it wins wherever Quarto mounts the runtime footer. */
+:has(section.isu-section.present) > .footer,
+:has(section.isu-section.present) .footer.footer-default,
+:has(section.isu-section.present) .slide-number {
+  display: none !important;
+}
+
+/* eyebrow: gold all-caps kicker ("Part 1" / "Demo") */
+.reveal section.isu-section .eyebrow {
+  color: #F1BE48;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  font-size: 22px;
+  margin: 0 0 16px 0;
+}
+
+/* the big white section/demo title */
+.reveal section.isu-section .big {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 56px;
+  line-height: 1.04;
+  margin: 0;
+}
+
+/* thin gold rule under the title */
+.reveal section.isu-section .rule {
+  display: block;
+  width: 130px;
+  height: 2px;
+  background: rgba(241, 190, 72, 0.85);
+  margin: 24px 0;
+}
+
+/* italic white sub-caption */
+.reveal section.isu-section .sub {
+  color: #ffffff;
+  font-style: italic;
+  font-weight: 400;
+  font-size: 26px;
+  max-width: 78%;
+  margin: 0;
+}
+
+/* the runnable command, monospace on a faint dark chip */
+.reveal section.isu-section p code,
+.reveal section.isu-section .cmd {
+  color: #ffffff;
+  font-size: 24px;
+  background: rgba(0, 0, 0, 0.20);
+  padding: 8px 16px;
+  border-radius: 5px;
+}
+.reveal section.isu-section p:has(> code) {
+  margin-top: 26px;
+}

@@ -1,0 +1,321 @@
+% Encoding: UTF-8
+
+% =============================================================================
+% Foundations: grammar of graphics, ggplot2, tidyverse
+% =============================================================================
+
+@Book{Tukey1977,
+  author    = {John W. Tukey},
+  publisher = {Addison-Wesley},
+  title     = {Exploratory Data Analysis},
+  year      = {1977},
+  address   = {Reading, Massachusetts},
+}
+
+@Misc{HenryWickham2017,
+  author       = {Lionel Henry and Hadley Wickham},
+  title        = {Tidy Evaluation (Hygienic Fexprs)},
+  year         = {2017},
+  howpublished = {Slides, Directions in Statistical Computing 2017},
+  url          = {https://www.r-project.org/dsc/2017/slides/tidyeval-hygienic-fexprs.pdf},
+}
+
+@Book{Wickham2016,
+  author    = {Hadley Wickham},
+  publisher = {Springer-Verlag New York},
+  title     = {ggplot2: Elegant Graphics for Data Analysis},
+  year      = {2016},
+  isbn      = {978-3-319-24277-4},
+  url       = {https://ggplot2.tidyverse.org},
+}
+
+% Cite-key `ggplot2` is used in manuscript as a package citation (separately from
+% Wickham2016 which is cited as the grammar-of-graphics book reference).
+@Manual{ggplot2,
+  title  = {ggplot2: Create Elegant Data Visualisations Using the Grammar of Graphics},
+  author = {Hadley Wickham and Winston Chang and Lionel Henry and Thomas Lin Pedersen and Kohske Takahashi and Claus Wilke and Kara Woo and Hiroaki Yutani and Dewey Dunnington and Teun {van den Brand}},
+  year   = {2026},
+  note   = {R package version 4.0.3},
+  url    = {https://CRAN.R-project.org/package=ggplot2},
+  doi    = {10.32614/CRAN.package.ggplot2},
+}
+
+@Article{tidyverse,
+  title    = {Welcome to the {tidyverse}},
+  author   = {Hadley Wickham and Mara Averick and Jennifer Bryan and Winston Chang and Lucy D'Agostino McGowan and Romain Fran{\c c}ois and Garrett Grolemund and Alex Hayes and Lionel Henry and Jim Hester and Max Kuhn and Thomas Lin Pedersen and Evan Miller and Stephan Milton Bache and Kirill M{\"u}ller and Jeroen Ooms and David Robinson and Dana Paige Seidel and Vitalie Spinu and Kohske Takahashi and Davis Vaughan and Claus Wilke and Kara Woo and Hiroaki Yutani},
+  year     = {2019},
+  journal  = {Journal of Open Source Software},
+  volume   = {4},
+  number   = {43},
+  pages    = {1686},
+  doi      = {10.21105/joss.01686},
+}
+
+% =============================================================================
+% Shiny ecosystem (ggpaintr Imports/Suggests)
+% =============================================================================
+
+@Manual{shiny,
+  title  = {shiny: Web Application Framework for {R}},
+  author = {Winston Chang and Joe Cheng and JJ Allaire and Carson Sievert and Barret Schloerke and Garrick Aden-Buie and Yihui Xie and Jeff Allen and Jonathan McPherson and Alan Dipert and Barbara Borges},
+  year   = {2026},
+  note   = {R package version 1.13.0},
+  url    = {https://CRAN.R-project.org/package=shiny},
+  doi    = {10.32614/CRAN.package.shiny},
+}
+
+@Manual{shinywidgets,
+  title  = {shinyWidgets: Custom Inputs Widgets for Shiny},
+  author = {Victor Perrier and Fanny Meyer and David Granjon},
+  year   = {2026},
+  note   = {R package version 0.9.1},
+  url    = {https://CRAN.R-project.org/package=shinyWidgets},
+  doi    = {10.32614/CRAN.package.shinyWidgets},
+}
+
+@Manual{bslib,
+  title  = {bslib: Custom 'Bootstrap' 'Sass' Themes for 'shiny' and 'rmarkdown'},
+  author = {Carson Sievert and Joe Cheng and Garrick Aden-Buie},
+  year   = {2026},
+  note   = {R package version 0.11.0},
+  url    = {https://CRAN.R-project.org/package=bslib},
+  doi    = {10.32614/CRAN.package.bslib},
+}
+
+% =============================================================================
+% Datasets used in worked examples
+% =============================================================================
+
+@Article{vanderplas2023penguins,
+  title   = {Penguins Go Parallel: A Grammar of Graphics Framework for Generalized Parallel Coordinate Plots},
+  author  = {Susan VanderPlas and Yawei Ge and Antony Unwin and Heike Hofmann},
+  journal = {Journal of Computational and Graphical Statistics},
+  year    = {2023},
+  volume  = {32},
+  number  = {4},
+  pages   = {1572--1587},
+  doi     = {10.1080/10618600.2023.2195462},
+}
+
+@Manual{hofmann2022ggpcp,
+  title  = {ggpcp: Parallel Coordinate Plots in the 'ggplot2' Framework},
+  author = {Heike Hofmann and Susan VanderPlas and Yawei Ge},
+  year   = {2022},
+  note   = {R package version 0.2.0},
+  url    = {https://CRAN.R-project.org/package=ggpcp},
+}
+
+@Manual{GGally,
+  title  = {GGally: Extension to 'ggplot2'},
+  author = {Barret Schloerke and Di Cook and Joseph Larmarange and Francois Briatte and Moritz Marbach and Edwin Thoen and Amos Elberg and Jason Crowley},
+  year   = {2025},
+  note   = {R package version 2.4.0},
+  url    = {https://CRAN.R-project.org/package=GGally},
+}
+
+@Manual{horst2020palmerpenguins,
+  title  = {palmerpenguins: Palmer Archipelago (Antarctica) Penguin Data},
+  author = {Allison Marie Horst and Alison Presmanes Hill and Kristen B. Gorman},
+  year   = {2020},
+  note   = {R package version 0.1.0},
+  doi    = {10.5281/zenodo.3960218},
+  url    = {https://allisonhorst.github.io/palmerpenguins/},
+}
+
+% =============================================================================
+% Reproducibility / authoring tools
+% =============================================================================
+
+@Manual{knitr,
+  title  = {knitr: A General-Purpose Package for Dynamic Report Generation in {R}},
+  author = {Yihui Xie},
+  year   = {2025},
+  note   = {R package version 1.51},
+  url    = {https://yihui.org/knitr/},
+}
+
+@Manual{R-base,
+  title        = {R: A Language and Environment for Statistical Computing},
+  author       = {{R Core Team}},
+  organization = {R Foundation for Statistical Computing},
+  address      = {Vienna, Austria},
+  year         = {2026},
+  url          = {https://www.R-project.org/},
+}
+
+% =============================================================================
+% ggpaintr internal-helper packages
+% =============================================================================
+
+@Manual{rlang,
+  title  = {rlang: Functions for Base Types and Core {R} and 'Tidyverse' Features},
+  author = {Lionel Henry and Hadley Wickham},
+  year   = {2026},
+  note   = {R package version 1.2.0},
+  url    = {https://CRAN.R-project.org/package=rlang},
+  doi    = {10.32614/CRAN.package.rlang},
+}
+
+% =============================================================================
+% LLM-assisted authoring (Suggests dependency, used in §7 Discussion)
+% =============================================================================
+
+@Manual{ellmer,
+  title  = {ellmer: Chat with Large Language Models},
+  author = {Hadley Wickham and Joe Cheng and Aaron Jacobs and Garrick Aden-Buie and Barret Schloerke},
+  year   = {2026},
+  note   = {R package version 0.4.1},
+  url    = {https://CRAN.R-project.org/package=ellmer},
+  doi    = {10.32614/CRAN.package.ellmer},
+}
+
+% =============================================================================
+% Prior-art GUI tools for ggplot2 (Step 9 contribution-wedge paragraph)
+% =============================================================================
+
+@Manual{esquisse,
+  title  = {esquisse: Explore and Visualize Your Data Interactively},
+  author = {Fanny Meyer and Victor Perrier},
+  year   = {2025},
+  note   = {R package version 2.1.0},
+  url    = {https://CRAN.R-project.org/package=esquisse},
+  doi    = {10.32614/CRAN.package.esquisse},
+}
+
+@Manual{ggplotgui,
+  title  = {ggplotgui: Create Ggplots via a Graphical User Interface},
+  author = {Gert Stulp},
+  year   = {2017},
+  note   = {R package version 1.0.0},
+  url    = {https://CRAN.R-project.org/package=ggplotgui},
+}
+
+@Manual{ggraptR,
+  title  = {ggraptR: Allows Interactive Visualization of Data Through a Web Browser GUI},
+  author = {Eugene Dubossarsky and Julius Neggo and Howard Song and Susan Wang and Jason Widjaja and Jose Magana and Sergey Skripko},
+  year   = {2020},
+  note   = {R package version 1.3},
+  url    = {https://CRAN.R-project.org/package=ggraptR},
+}
+
+% =============================================================================
+% Carry-overs from the original bibliography (kept; not currently cited but
+% retained for reference during revision)
+% =============================================================================
+
+@Article{Tukey1962,
+  author    = {John W. Tukey},
+  journal   = {The Annals of Mathematical Statistics},
+  title     = {The Future of Data Analysis},
+  year      = {1962},
+  number    = {1},
+  pages     = {1--67},
+  volume    = {33},
+  doi       = {10.1214/aoms/1177704711},
+}
+
+@Article{Kasprzak2021,
+  author  = {Peter Kasprzak and Lachlan Mitchell and Olena Kravchuk and Andy Timmins},
+  title   = {Six Years of {Shiny} in Research --- Collaborative Development of Web Tools in {R}},
+  year    = {2021},
+  journal = {The R Journal},
+  volume  = {12},
+  number  = {2},
+  pages   = {155--162},
+  doi     = {10.32614/RJ-2021-004},
+  url     = {https://journal.r-project.org/archive/2021/RJ-2021-004/index.html},
+}
+
+@Article{Wickham2014,
+  author  = {Hadley Wickham},
+  journal = {Journal of Statistical Software},
+  title   = {Tidy Data},
+  year    = {2014},
+  number  = {10},
+  pages   = {1--23},
+  volume  = {59},
+  doi     = {10.18637/jss.v059.i10},
+}
+
+@Article{Wickham2010,
+  author    = {Hadley Wickham},
+  journal   = {Journal of Computational and Graphical Statistics},
+  title     = {A Layered Grammar of Graphics},
+  year      = {2010},
+  number    = {1},
+  pages     = {3--28},
+  volume    = {19},
+  doi       = {10.1198/jcgs.2009.07098},
+  url       = {https://doi.org/10.1198/jcgs.2009.07098},
+}
+
+@Book{Wilkinson2005,
+  author    = {Leland Wilkinson},
+  title     = {The Grammar of Graphics},
+  publisher = {Springer-Verlag},
+  address   = {New York},
+  year      = {2005},
+  edition   = {2nd},
+  isbn      = {978-0-387-24544-7},
+}
+
+% =============================================================================
+% Related-tools comparison entries (Section "Comparison with related tools").
+% =============================================================================
+
+@Manual{ggThemeAssist,
+  title  = {ggThemeAssist: Add-in to Customize 'ggplot2' Themes},
+  author = {Calli Gross and Philipp Ottolinger},
+  year   = {2016},
+  note   = {R package version 0.1.5},
+  url    = {https://CRAN.R-project.org/package=ggThemeAssist},
+}
+
+@Misc{ggannotate,
+  title        = {ggannotate: Interactively Annotate Plots},
+  author       = {Matt Cowgill},
+  year         = {2020},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/MattCowgill/ggannotate},
+  note         = {R package version 0.0.1, not on CRAN},
+}
+
+@Manual{radiant,
+  title  = {radiant: Business Analytics using R and Shiny},
+  author = {Vincent Nijs},
+  year   = {2026},
+  note   = {R package version 1.6.7},
+  url    = {https://CRAN.R-project.org/package=radiant},
+}
+
+@Misc{shinyuieditor,
+  title        = {shinyuieditor: Visual Editor for Production-Quality {Shiny} Apps},
+  author       = {Nick Strayer},
+  organization = {Posit Software, PBC},
+  year         = {2022},
+  url          = {https://rstudio.github.io/shinyuieditor/},
+  note         = {Software},
+}
+
+@InProceedings{rawgraphs,
+  author    = {Mauri, Michele and Elli, Tommaso and Caviglia, Giorgio and Uboldi, Giorgio and Azzi, Matteo},
+  title     = {{RAWGraphs}: A Visualisation Platform to Create Open Outputs},
+  booktitle = {Proceedings of the 12th Biannual Conference on {Italian} {SIGCHI} Chapter ({CHItaly} '17)},
+  year      = {2017},
+  pages     = {28:1--28:5},
+  address   = {Cagliari, Italy},
+  publisher = {ACM},
+  isbn      = {978-1-4503-5237-6},
+  doi       = {10.1145/3125571.3125585},
+}
+
+@Manual{plotly,
+  title  = {plotly: Create Interactive Web Graphics via {plotly.js}},
+  author = {Carson Sievert and Chris Parmer and Toby Hocking and Scott Chamberlain and Karthik Ram and Marianne Corvellec and Pedro Despouy},
+  year   = {2026},
+  note   = {R package version 4.12.0},
+  url    = {https://CRAN.R-project.org/package=plotly},
+  doi    = {10.32614/CRAN.package.plotly},
+}
+
+@Comment{jabref-meta: databaseType:bibtex;}
