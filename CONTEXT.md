@@ -37,3 +37,4 @@ The single unquoted `ggplot2`/`dplyr`-style expression (string fallback allowed)
 ## Flagged ambiguities
 
 - "lazy-lazy evaluation" vs "interactive masking" were used interchangeably in early drafts — resolved: same concept, *interactive masking* is canonical in speech and on slides; *lazy-lazy* survives only as the title's alias.
+- "interactive graphic" — resolved (2026-06-09): reserved for **within-plot** interaction (hover, brushing, zoom), which is *not* a ggpaintr feature (it belongs to the calling app's render path, e.g. plotly). The ggpaintr move is "**components of a graphic turned into controls**". The *app* may still be called interactive; the *graphic* may not.

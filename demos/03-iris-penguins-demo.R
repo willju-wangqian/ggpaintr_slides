@@ -15,13 +15,14 @@ library(dplyr)
 library(palmerpenguins)
 
 ptr_app(
-  penguins |>
-    filter(!is.na(sex)) |>
-    ggplot(aes(x = ppVar(flipper_length_mm),
-               y = ppVar(body_mass_g),
-               color = ppVar(species))) +
-    geom_point(size = ppNum(2), alpha = ppNum(0.8)) +
+  ggplot(
+    ppUpload(iris),
+    aes(
+      x = ppVar(Sepal.Length),
+      y = ppVar(Sepal.Width),
+      color = ppVar(Species))) +
+    geom_point() +
+    facet_wrap(~ ppVar(Species)) +
     geom_smooth(method = ppText("lm")) +
-    facet_wrap(~ ppVar) +
-    labs(title = ppText("Palmer penguins"))
+    labs(title = ppText("Iris app"))
 )

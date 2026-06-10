@@ -22,11 +22,11 @@ execute:
 
 ## The idea in one line {.smaller}
 
-Write the plot you already know how to write — mark the parts a user should
-control — and get a running Shiny app **for free**.
+:::: {.columns .col-divider}
+::: {.column width="35%"}
+Ordinary R plotting code (`ggplot2`) for a scatterplot, with three values
+**embellished** as `ppVar(...)`.
 
-:::: {.columns}
-::: {.column width="46%"}
 ```r
 library(ggpaintr)
 
@@ -39,20 +39,22 @@ ptr_app(
 )
 ```
 :::
-::: {.column width="54%"}
+::: {.column width="65%"}
+The Shiny app that one expression becomes:
+
 ![](images/annotated/annotated_iris_app.png){height="330"}
 :::
 ::::
 
 . . .
 
-No `ui`. No `server`. No widget IDs. No `.data[[input$x]]`.
-One formula → a dashboard **and** the runnable code that reproduces it.
+Each embellished value becomes exactly one control — `ggpaintr` generates the
+rest of the app.
 
 ## Outline
 
-- **Motivation** — when is a Shiny app worth it, and what does it cost to build one?
-- **Demo** — the penguins dashboard, live
+- **Motivation** — why turn parts of a graphic into controls, and why that's harder than it should be
+- **Demo** — the iris-penguins app
 - **Background** — Shiny, the grammar of graphics, lazy & tidy evaluation
 - **Design** — placeholders, embellishment, **interactive masking**
 - **Extensibility** — custom placeholders, embedding, sharing, your own render path
@@ -67,62 +69,33 @@ One formula → a dashboard **and** the runnable code that reproduces it.
 
 []{.rule}
 
-[When is a Shiny app worth building — and what does it cost?]{.sub}
+[Why turn parts of a graphic into controls — and why is that harder than it should be?]{.sub}
 
-## Two moments where a Shiny app pays off
+## Motivation: two moments where a Shiny app is helpful
 
-:::: {.columns}
-::: {.column width="50%"}
-**Present your results**
+- **Shiny dashboard**
+  - presenting a **finished** analysis in a Shiny app, with pre-defined and chosen controls exposed to users
+  - structured layout, navigation, sharing
+- **Exploration tool**
+  - visualizing data with different combination of variables quickly
 
-You have a *finished* analysis. You want collaborators to **interact** with the
-figure — swap a variable, re-color, filter — without sending them R code.
-
-→ a **dashboard**
-:::
-::: {.column width="50%"}
-**Explore your data**
-
-You are *still looking*. You want to scan many versions of a plot quickly —
-every pair of variables, different groupings.
-
-→ an **exploration tool**
-:::
-::::
-
-. . .
-
-Both are the same move: **a graphic, with some components turned into controls.**
-
-## Scenario 1 · Present results {.smaller}
+## Shiny dashboard
 
 A published parallel-coordinate plot of the penguins
 [@vanderplas2023penguins], built with `ggplot2` + `ggpcp`. Turn it into a
 dashboard: pick the axes, rescale, recolor.
 
-![](images/annotated/annotated_pcp_app.png){height="360"}
+![](images/annotated/annotated_pcp_app.png){height="360" fig-align="center"}
 
-## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
-
-[Demo]{.eyebrow}
-
-[Scenario 1]{.big}
-
-[]{.rule}
-
-[A published plot, made interactive]{.sub}
+. . .
 
 `shiny::runApp("demos/01-ggpcp-dashboard.R")`
 
-::: {.notes}
-App pre-launched in a browser tab — switch tabs, never cold-start. ~3 min.
-If asked about the Draw button or code panel now: "I'll come back to that panel."
-:::
+## Explore data {.smaller}
 
-## Scenario 2 · Explore data {.smaller}
+The question: how does each pair of `iris` variables relate?
 
-The question: how does each pair of `iris` variables relate, split by a third?
-In plain `ggplot2` you write one call, then edit it, again and again:
+In plain `ggplot2`, we write one call, then edit it, again and again:
 
 ```r
 library(ggplot2)
@@ -131,30 +104,33 @@ ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color = Species)) +
   geom_point()
 
 # now change x... and y... and color
-ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + geom_point()
-ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) + geom_point()
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width, color = Species)) + 
+  geom_point()
+
+ggplot(iris, aes(x = Sepal.Length, y = Petal.Length, color = Species)) + 
+  geom_point()
 ```
 
-Re-typing the same call to change three slots is exactly the loop a widget
-should absorb.
+. . .
 
-## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
+Re-typing the same call to change three slots is exactly where a widget should be used in an app.
 
-[Demo]{.eyebrow}
-
-[Scenario 2]{.big}
-
-[]{.rule}
-
-[Three dropdowns: X, Y, Color]{.sub}
+. . .
 
 `shiny::runApp("demos/02-iris-explore.R")`
 
-::: {.notes}
-Pre-launched tab. Keep to ~1 min: swap x/y/color, Draw, done.
-:::
+<!-- ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"} -->
 
-## What that Shiny app costs by hand {.smaller .scrollable}
+<!-- [Demo]{.eyebrow} -->
+
+<!-- [Scenario 2]{.big} -->
+
+<!-- []{.rule} -->
+
+<!-- [Three dropdowns: X, Y, Color]{.sub} -->
+
+
+## Shiny code behind the iris app {.smaller .scrollable}
 
 :::: {.columns}
 ::: {.column width="55%"}
@@ -182,87 +158,96 @@ server <- function(input, output, session) {
       geom_point()
   })
 }
+
 shinyApp(ui, server)
 ```
 :::
 ::: {.column width="45%"}
-The obligations behind those 28 lines:
+The obligations behind those 25 lines:
 
 - every widget needs a **unique ID, label, choices, default**
-- the dropdown returns a **string**, but `aes()` wants a **symbol** → bridge with `.data[[input$x]]`
-- the plot is declared **twice**: `plotOutput()` *and* `renderPlot()`, IDs must match
-- UI pieces nest in the right order
-- **each new control multiplies all of this**
-
-Add a title, draw button, facet, smoothing method → 28 → 40 → 56 lines.
+- the dropdown returns a **string**, but `aes()` wants a **symbol**, so `.data[[input$x]]` is used
+- the plot is declared both in `ui` and `server`, and IDs must match
+- UI pieces placed for the right layout
 :::
 ::::
 
-## The ggpaintr code {.smaller}
+::: {.fragment}
+Adding more layers to the graphic requires more control widgets
+
+- For example, add a title, facet, and smoothing method
+- each new control multiplies all of this
+:::
+
+## Reproduce the same app with ggpaintr {.smaller}
 
 The same app — one `ptr_app()` call:
 
-```r
+:::: {.columns .col-divider}
+::: {.column width="45%"}
+```{.r code-line-numbers="1,3-5"}
 ptr_app(
-  ggplot(iris, aes(x = ppVar(Sepal.Length),
-                   y = ppVar(Sepal.Width),
-                   color = ppVar(Species))) +
+  ggplot(iris, aes(
+    x = ppVar(Sepal.Length),
+    y = ppVar(Sepal.Width),
+    color = ppVar(Species))) +
     geom_point()
 )
 ```
-
-:::: {.columns}
-::: {.column width="50%"}
-![](images/annotated/annotated_code_iris.png){height="250"}
 :::
-::: {.column width="50%"}
+::: {.column width="55%"}
 ![](images/annotated/annotated_iris_app.png){height="250"}
 :::
 ::::
 
-Each placeholder occurrence → exactly one control widget.
 
-## Why this works — one idea {.smaller}
+## iris app with more controls {.smaller}
 
-**Interactive masking.** The formula is captured *before it runs*. Instead of
-filling in its blanks from fixed values, ggpaintr fills them from the **live
-app** — the current widgets, the uploaded data, the toggled layers — on every
-**Draw**.
+:::: {.columns .col-divider}
+::: {.column width="45%"}
+
+```{.r code-line-numbers="3,9-11"}
+ptr_app(
+  ggplot(
+    ppUpload(iris), 
+    aes(
+      x = ppVar(Sepal.Length),
+      y = ppVar(Sepal.Width),
+      color = ppVar(Species))) +
+    geom_point() +
+    facet_wrap(~ ppVar(Species)) + 
+    geom_smooth(method = ppText("lm")) + 
+    labs(title = ppText("Iris app"))
+)
+```
+
+:::
+::: {.column width="55%"}
+Added controls:
+
+- data upload
+- faceting
+- smooth line fitting
+- plot title
+:::
+::::
 
 . . .
 
-Everything else is a consequence:
+`shiny::runApp("demos/03-iris-penguins-demo.R")`
 
-- **No UI↔server wiring.** One node is *both* the widget and the slot its value
-  returns to, so they cannot drift out of step. A whole class of bug disappears.
-- **The formula is the whole record.** Same formula → same app, every time.
-- **Embellishment is free.** Placeholders are identity functions in plain R, so
-  the embellished formula still draws the original plot on its own.
-- **Reproducible output.** A side code panel prints runnable `ggplot2` code for
-  exactly what is on screen.
-- **Scales by writing formulas, not apps.** One formula = one visualization module.
 
-::: {.notes}
-Plain-language statement of the contribution. Part 3 restates it precisely
-once data masking has been taught.
-:::
+## Motivation
 
-## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
+- **dashboard**: fast prototype with core visualization implemented
+- **exploration**: explore right away without writing Shiny code
 
-[Demo]{.eyebrow}
+. . .
 
-[Penguins data]{.big}
+**Behind the scene**
 
-[]{.rule}
+- **Interactive masking** --- the formula is captured *before it runs*; captured formula is manipulated interactively with user's input
 
-[ppVar · ppNum · ppText · layer toggles]{.sub}
-
-`shiny::runApp("demos/03-penguins-demo.R")`
-
-::: {.notes}
-Pre-launched tab. The workhorse demo (~4 min) — it illustrates the interactive-
-masking idea just stated: widgets fill the formula's blanks on each Draw.
-:::
 
 ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
 
@@ -285,9 +270,9 @@ A **Shiny** app is an interactive web app written in R [@shiny].
 - Sliders, dropdowns, uploads drive R-computed plots, tables, and text.
 - Widely used to **share an analysis** with people who don't write R.
 
-`ggplot2` usually sits at the center: the grammar's components map onto widgets.
+`ggplot2` usually sits at the center: the graphical components are mapped onto widgets
 
-## ggplot2 and the grammar of graphics {.smaller}
+## ggplot2 and the grammar of graphics
 
 The **grammar of graphics** [@Wilkinson2005] describes a plot as a *composition*
 of small parts, not a chart type. `ggplot2` [@Wickham2016] implements it in
@@ -295,59 +280,145 @@ layered form [@Wickham2010]:
 
 ```r
 ggplot(data, aes(x = ..., y = ..., color = ...)) +   # data + aesthetic mappings
-  geom_point() +                                      # geometric layers
-  facet_wrap(~ group)                                 # facets, scales, coords...
+  geom_point() +                                     # geometric layers
+  facet_wrap(~ group)                                # facets, scales, coords...
 ```
 
 - A graphic = **data** + **aesthetic mappings** + **geometric layers** (+ scales, coords, facets).
-- Layers combine with `+`. **Swap one part without rebuilding the rest** — exactly
-  the move exploration needs.
-- That structure is what ggpaintr hooks into: each controllable component becomes
-  a widget.
+- Layers combine with `+`
+- Graphical components are naturally candidates for Shiny app widgets
+
+## ggplot2 and the grammar of graphics
+
+
+```{r iris-scatter}
+#| echo: true
+#| eval: true
+#| fig-width: 7
+#| fig-height: 4.5
+library(ggplot2)
+
+ggplot(iris,                    # data
+  aes(x = Sepal.Length,         # aesthetic mapping x, y, and color
+      y = Sepal.Width,
+      color = Species)) +
+  geom_point()                  # geometric point layer 
+```
+
+
+## ggplot2 and the grammar of graphics
+
+```{r iris-scatter2}
+#| echo: true
+#| eval: true
+#| code-line-numbers: "8-9"
+#| fig-height: 4.5
+library(ggplot2)
+
+ggplot(iris,
+  aes(x = Sepal.Length,
+      y = Sepal.Width,
+      color = Species)) +
+  geom_point() +
+  geom_line(color = 'red') +    # geometric line layer on top of the points
+  facet_wrap(~ Species)         # faceting layer
+```
+
 
 ## Lazy evaluation — R doesn't run code right away {.smaller}
 
 R uses **lazy evaluation**: a function argument is evaluated only when needed.
-This powers R's **metaprogramming** — capturing code *as code* before it runs.
+This powers R's **metaprogramming** --- R expression can be captured and manipulated
 
-```r
-f <- function(x) substitute(x)   # capture the argument's expression
-f(a + b * 2)
-#> a + b * 2                      # the CODE, not a value
+```{r lazy-eval}
+#| echo: true
+#| eval: false
+f <- substitute(
+  ggplot(iris, aes(x = Sepal.Length)) + geom_histogram()
+)
+
+f
+#> ggplot(iris, aes(x = Sepal.Length)) + geom_histogram()
+
+f[[1]]
+#> `+`
+
+f[[2]]
+#> ggplot(iris, aes(x = Sepal.Length))
+
+f[[2]][[1]]
+#> ggplot
 ```
 
-- `f()` never receives the *value* of `a + b * 2` — it receives the **code
-  itself**, which can be inspected, taken apart, and rewritten before it runs.
-- **ggpaintr captures the formula this way** and then *manipulates the
-  expression* — splitting layers, recording placeholder positions, substituting
-  values — before it is ever evaluated.
+## Lazy evaluation — R doesn't run code right away {.smaller}
 
-::: aside
-Reference — base tools: `substitute()`, `match.call()` (capture); `quote()`, `bquote()` (quote / partial substitute); `eval()` + `with()` (evaluate against data).
-:::
+```{r lazy-eval2-prepare}
+#| echo: false
+#| eval: true
+f <- substitute(
+  ggplot(iris, aes(x = Sepal.Length)) + geom_histogram()
+)
+```
+
+We can modify an expression 
+
+```{r lazy-eval2}
+#| echo: true
+#| eval: false
+f[[2]][[3]][[2]]
+#> Sepal.Length
+
+f[[2]][[3]][[2]] <- as.symbol("Sepal.Width")      # replace Sepal.Length with Sepal.Width
+
+f
+#> ggplot(iris, aes(x = Sepal.Width)) + geom_histogram()
+```
+
+```{r lazy-eval3-prepare}
+#| echo: false
+#| eval: true
+f[[2]][[3]][[2]] <- as.symbol("Sepal.Width")
+```
+
+then evaluate the modified expression
+
+```{r lazy-eval3}
+#| echo: true
+#| eval: true
+eval(f)
+```
+
+`ggpaintr` manipulates the input expression in a more sophisticated way
 
 ## Tidy evaluation — rlang and data masking {.smaller}
 
 **Tidy evaluation** [@HenryWickham2017; @rlang] consolidates R's base tools
-behind one clean interface, and adds **data masking**:
+behind one clean interface, and adds **data masking**
 
-```r
-aes(x = Sepal.Length)     # `Sepal.Length` is NOT looked up now...
-                          # ...later it resolves against a data frame: data masking
+```{r}
+#| echo: true
+#| eval: false
+
+Sepal.Width                            # Error: object 'Sepal.Width' not found
+
+ggplot(iris, aes(x = Sepal.Width))     # `Sepal.Length` is recognized as 
+                                       # a valid column name
 ```
 
-- There is no variable `Sepal.Length` in the workspace — yet this works. The
-  name waits, then resolves **inside the data frame**: that is **data masking**.
-- The result: column names resolve **as variables** while other names resolve at
-  the call site.
-
-::: aside
-Reference — the rlang interface: a **quosure** bundles a captured expression with its environment; `enquo()` / `{{ }}` defuse, `!!` unquotes, `eval_tidy()` evaluates with the `.data` / `.env` pronouns.
-:::
+- when `Sepal.Width` is used inside `ggplot()`, it is not evaluated immediately
+- `Sepal.Width` sees a data mask `iris` --- `iris` becomes a data context or data environment, where `Sepal.Width` exists as a numeric vector
+- `Sepal.Width` is actually `iris$Sepal.Width` when evaluating
 
 . . .
 
-**ggpaintr's twist:** keep this loop, but change *what the expression resolves against.*
+Similarly, we have
+
+- `dplyr::filter(iris, Sepal.Width > 10)`
+- both `dplyr::filter()` and `ggplot()` use **tidy evaluation**
+
+. . .
+
+`ggpaintr` uses tidy evaluation as well, but the expression is manipulated before it is evaluated
 
 ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
 
@@ -372,8 +443,8 @@ Its name says which widget to build and how to substitute the widget's value.
 | `ppVar` | column picker | the chosen column (a symbol) | **data consumer** |
 | `ppUpload` | file upload | a data frame (.csv/.rds/.xlsx/...) | **data source** |
 
-- With an argument — `ppVar(Sepal.Length)` — the argument is the widget's **default**.
-- Written bare — `ppVar` — the slot starts **blank**.
+- With an argument: `ppVar(Sepal.Length)` --> the argument becomes the widget's **starting value**.
+- Written bare: `ppVar` --> the widget starts **blank**.
 - Plus two **structural keywords**: `ppLayerOff()` (start a layer off) and
   `ppVerbSwitch()` (toggle a pipeline stage).
 
@@ -385,16 +456,16 @@ layer** — the parser threads that context down the tree.
 ```r
 ptr_app(
   iris |>
-    group_by(ppVar) |>            # pickers here see RAW iris columns
+    group_by(ppVar) |>                      # pickers here see RAW iris columns
     summarise(mean_val = mean(ppVar)) |>
-    ggplot(aes(x = ppVar, y = ppVar)) +   # pickers here see the REDUCED frame
+    ggplot(aes(x = ppVar, y = ppVar)) +     # pickers here see the REDUCED frame
     geom_col()
 )
 ```
 
-A reshaping step changes the columns: a picker **upstream** of it sees different
-choices than one **downstream**. The list refreshes at run time when an upload
-replaces the data.
+- first `ppVar` sees all columns of `iris`
+- if we have `group_by(Species)`, then the second `ppVar` sees only `Species` (the grouping variable) and `mean_val`
+- consumers resolve their **upstream data** and refresh its drop-down menu at run time
 
 ## Embellishment {.smaller}
 
@@ -405,46 +476,79 @@ functions are the **identity in plain R**:
 ppVar <- function(x = NULL, ...) x      # (conceptually)
 ```
 
-- So a placeholder-embellished formula is **still ordinary `ggplot2` code** — on
-  its own it draws the original plot.
-- An analyst embellishes their working plot **at no cost**, keeping the option to
-  turn it into an app whenever they want.
-- The default values let ggpaintr **open the app on the finished plot**, not a blank one.
-- At draw time ggpaintr substitutes each placeholder with its widget's value and
-  evaluates — the *same* substitution on the plain code is the reproducible output.
+```{r embellishment}
+#| echo: true
+#| eval: true
+#| output-location: column
+#| fig-width: 7
+#| fig-height: 4.5
+library(ggpaintr)
 
-## Interactive masking — the precise statement {.smaller}
+ggplot(iris,                    
+  aes(x = ppVar(Sepal.Length),  
+      y = ppVar(Sepal.Width),
+      color = ppVar(Species))) +
+  geom_point()                  
+```
+
+- A placeholder-embellished formula is **still ordinary `ggplot2` code** --- on its own it draws the original plot.
+- When used as input formula of `ptr_app()`, the embellished graphical component object become the default widget values
+<!-- - An analyst embellishes their working plot **at no cost**, keeping the option to -->
+<!--   turn it into an app whenever they want. -->
+<!-- - The default values let ggpaintr **open the app on the finished plot**, not a blank one. -->
+<!-- - At draw time ggpaintr substitutes each placeholder with its widget's value and -->
+  <!-- evaluates — the *same* substitution on the plain code is the reproducible output. -->
+
+## Embellishment {.smaller}
+
+- Marking graphical components (defined by grammar of graphics) that can be substituted and controlled by user's input
+
+```{r embellishment2}
+#| echo: true
+#| eval: false
+#| fig-width: 7
+#| fig-height: 4.5
+#| code-line-numbers: "2"
+ggplot(iris,                    
+  aes(x = ppVar(Sepal.Length),        # we need a picker for x-axis, whose default is Sepal.Length
+      y = ppVar(Sepal.Width),
+      color = ppVar(Species))) +
+  geom_point()                  
+```
+
+- Preserve the original finished graphical result, and can opt-in to a Shiny app whenever they want
+- Present the finished graphical result at app startup
+
+
+## Interactive masking and lazy-lazy evaluation
 
 Tidy evaluation defers **which data** a fixed expression binds.
-ggpaintr additionally defers **which expression runs at all.**
+`ggpaintr` additionally defers **which expression runs at all**
 
+- **Doubled laziness** = *which expression* **+** *which data*
 - Tidy eval resolves the captured code against **a data frame, handed over once**.
-- ggpaintr resolves it against the **live, changing state of a running Shiny
-  session** — current controls, uploaded data, which layers/stages are on —
-  *reassembled on each draw.*
-- The mask is **written into the formula itself**: a placeholder both declares
-  the widget *and* names the slot it fills.
-- **Doubled laziness** = *which data* **+** *which expression*. That is what
-  "lazy-lazy" names.
+- `ggpaintr` resolves it against the **live, changing state of a running Shiny session** 
+  - current control widget values, uploaded data, which layers/stages are on
+- The interactive mask is **written into the formula itself**: a placeholder both declares the widget *and* names the slot it fills
 
-## One formula, one parse, three views {.smaller}
+## ggpaintr and interactive masking
 
 ![](images/ggpaintr_mechanism.png){height="380"}
 
 The widget panel, the figure, and the code panel are **three views of the same
 filled-in tree** — they agree *by construction.*
 
-## Why a Draw button, not live reactivity?
+<!-- ## Why a Draw button, not live reactivity? -->
 
-- ggpaintr re-renders on an explicit **Draw / Update** click, not on every keystroke.
-- A user typing a label, or coordinating two controls in sequence, would
-  otherwise push the plot through **intermediate states they never meant to show.**
-- And someone copying the code mid-keystroke would leave with code for a state
-  they never kept.
-- One click = one **snapshot**: plot, substituted formula, and code panel all
-  refer to the *same* state.
-- On a bad input the runtime **catches the error**, reports where it failed, and
-  leaves the parsed formula intact — the session doesn't crash.
+<!-- - ggpaintr re-renders on an explicit **Draw / Update** click, not on every keystroke. -->
+<!-- - A user typing a label, or coordinating two controls in sequence, would -->
+<!--   otherwise push the plot through **intermediate states they never meant to show.** -->
+<!-- - And someone copying the code mid-keystroke would leave with code for a state -->
+<!--   they never kept. -->
+<!-- - One click = one **snapshot**: plot, substituted formula, and code panel all -->
+<!--   refer to the *same* state. -->
+<!-- - On a bad input the runtime **catches the error**, reports where it failed, and -->
+<!--   leaves the parsed formula intact — the session doesn't crash. -->
 
 ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
 
@@ -456,7 +560,7 @@ filled-in tree** — they agree *by construction.*
 
 [Custom placeholders, embedding, sharing, your own render path]{.sub}
 
-## The vocabulary is open {.smaller}
+## Custom placeholder --- the vocabulary is open {.smaller}
 
 Register a new placeholder in one of the **three roles** — it then behaves
 exactly like a built-in:
@@ -467,18 +571,17 @@ exactly like a built-in:
 | data consumer | `ptr_define_placeholder_consumer()` | `resolve_expr` | upstream `cols` + `data` |
 | data source | `ptr_define_placeholder_source()` | `resolve_data` | produces the frame |
 
-- Two hooks: a **`build_ui`** returning the Shiny tag, and a **resolver** turning
-  the widget value into the right object.
-- A `parse_positional_arg` validator (from the `ptr_arg_*` family) opts in to a
-  default like `ppScaleMethod("uniminmax")`.
-- Registration is **session-wide** — define once, visible to every app/module.
+- Two functions required when defining a new placeholder
+  - **`build_ui`**: which `UI` widget should `ggpaintr` use for this placeholder 
+  - **resolver**: how to turn the widget value into the right object
+- Registration is **session-wide** --- define once, visible to every app/module.
 
 ## Custom placeholder — example {.smaller .scrollable}
 
 Two placeholders the parallel-coordinate dashboard needs — each is just **two
 hooks**: a widget builder (`build_ui`) and a resolver (`resolve_expr`):
 
-```{.r code-line-numbers="4,7,15,17"}
+```{.r code-line-numbers="2,13,4,7,15,17"}
 # CONSUMER: pick several columns at once
 ppVars <- ptr_define_placeholder_consumer(
   keyword = "ppVars",
@@ -500,13 +603,11 @@ ppScaleMethod <- ptr_define_placeholder_value(
 )
 ```
 
-Full versions: `demos/06-custom-placeholder.R` (minimal) and
-`demos/01-ggpcp-dashboard.R` (these two).
+Full versions: `demos/01-ggpcp-dashboard.R`
 
-## Embed in a calling app — `ptr_ui()` / `ptr_server()` {.smaller .scrollable}
+## Embed ggpaintr in a calling app — `ptr_ui()` / `ptr_server()` {.smaller .scrollable}
 
-`ptr_app()` is the turn-key entry. Drop one level to place a ggpaintr plot inside
-**your own** app — you own the `shinyApp()` shell:
+Use `ggpaintr` functionalities in **your own** Shiny app:
 
 ```{.r code-line-numbers="7,11"}
 f <- rlang::expr(
@@ -515,23 +616,27 @@ f <- rlang::expr(
 
 ui <- fluidPage(
   h2("My dashboard"),
-  ptr_ui(!!f, "plot1")          # controls + output go here
+  ptr_ui(f, "plot1")          # controls + output panel
 )
 
 server <- function(input, output, session) {
-  ptr_server(!!f, "plot1")      # matching id; call it BARE, not in moduleServer()
+  ptr_server(f, "plot1")      # matching id; resolve the server logic
 }
 shinyApp(ui, server)
 ```
 
-Three tiers: `ptr_app()` → `ptr_ui()` + `ptr_server()` → the bare
-`ptr_ui_controls()` / `ptr_ui_plot()` / `ptr_ui_code()` pieces for a custom layout.
+Three tiers
+
+- `ptr_app()` 
+- `ptr_ui()` + `ptr_server()` 
+- split `ptr_ui()` into `ptr_ui_controls()` / `ptr_ui_plot()` / `ptr_ui_code()` pieces for a custom layout
 
 ## Multi-instance + shared placeholders {.smaller .scrollable}
 
-Several panels in one session; **one control drives all of them** via a `shared` key.
+multiple `ggpaintr` instances in one session
 
-```{.r code-line-numbers="3,5,8,11,16"}
+```{.r code-line-numbers="1-7,13,15,20,22"}
+# declare multiple formulas
 plots <- list(
   expr(ggplot(penguins, aes(flipper_length_mm, body_mass_g,
                             color = ppVar(species, shared = "grp"))) + geom_point()),
@@ -539,58 +644,85 @@ plots <- list(
                             color = ppVar(species, shared = "grp"))) + geom_point())
 )
 
-obj <- ptr_shared(plots)                        # 1. build the coordinator
+obj <- ptr_shared(plots)                        
 
 ui <- fluidPage(
-  ptr_shared_panel(obj),                        # 2. place the ONE shared widget
-  fluidRow(column(6, ptr_ui(plots[[1]], "body", shared = obj)),
-           column(6, ptr_ui(plots[[2]], "bill", shared = obj)))   # 3. shared = obj
+  ptr_shared_panel(obj),                        
+  fluidRow(column(6, ptr_ui(plots[[1]], "body",                      # use formula 1 with id "body"
+                            shared = obj)),      
+           column(6, ptr_ui(plots[[2]], "bill",                      # use formula 2 with id "bill"
+                            shared = obj)))      
 )
 server <- function(input, output, session) {
-  sh <- ptr_shared_server(obj)                  # 4. drive it; thread shared_state
-  ptr_server(plots[[1]], "body", shared_state = sh)
-  ptr_server(plots[[2]], "bill", shared_state = sh)
+  sh <- ptr_shared_server(obj)                 
+  ptr_server(plots[[1]], "body",                                     # resolve server logic for "body"
+             shared_state = sh)                  
+  ptr_server(plots[[2]], "bill",                                     # resolve server logic for "bill"
+             shared_state = sh)                  
 }
 ```
 
-Same `"grp"` key in both formulas → one top-level picker recolors both panels.
+Distinguished by an ID assigned to each instance
+
+## Multi-instance + shared placeholders {.smaller .scrollable}
+
+multiple placeholders share the same widget
+
+```{.r code-line-numbers="4,6,9,12,14,16,19,21,23"}
+# declare multiple formulas
+plots <- list(
+  expr(ggplot(penguins, aes(flipper_length_mm, body_mass_g,
+                            color = ppVar(species, shared = "grp"))) + geom_point()),
+  expr(ggplot(penguins, aes(bill_length_mm, bill_depth_mm,
+                            color = ppVar(species, shared = "grp"))) + geom_point())
+)
+
+obj <- ptr_shared(plots)                                             # build the coordinator
+
+ui <- fluidPage(
+  ptr_shared_panel(obj),                                             # place the ONE shared widget
+  fluidRow(column(6, ptr_ui(plots[[1]], "body", 
+                            shared = obj)),                          # pass the shared info for ui
+           column(6, ptr_ui(plots[[2]], "bill", 
+                            shared = obj)))   
+)
+server <- function(input, output, session) {
+  sh <- ptr_shared_server(obj)                                       # resolve server logic for shared placeholders
+  ptr_server(plots[[1]], "body", 
+             shared_state = sh)                                      # pass the shared state for server
+  ptr_server(plots[[2]], "bill", 
+             shared_state = sh)
+}
+```
+
+Same `"grp"` key in both formulas --> one top-level picker recolors both panels.
 
 ## Own the render path — plotly {.smaller .scrollable}
 
 A calling app can render the plot **itself**, reading the runtime state
 `ptr_server()` returns. This is also where in-plot interactivity (hover, zoom) lives.
 
-```{.r code-line-numbers="6,8,10"}
+```{.r code-line-numbers="2,3,6,7,8,10"}
 ui <- fluidPage(
-  ptr_ui_controls(plots[[2]], "bill", shared = obj),   # sidebar only...
-  plotly::plotlyOutput(NS("bill")("scatter"))          # ...our own output
+  ptr_ui_controls(plots[[2]], "bill", shared = obj),                 # sidebar only
+  plotly::plotlyOutput(NS("bill")("scatter"))                        # plotlyOutput
 )
 server <- function(input, output, session) {
   state <- ptr_server(plots[[2]], "bill", shared_state = sh)
-  output[[NS("bill")("scatter")]] <- plotly::renderPlotly({
-    res <- state$runtime()                 # $ok / $plot / $code
+  output[[NS("bill")("scatter")]] <- plotly::renderPlotly({          # renderPlotly
+    res <- state$runtime()                                           # $ok / $plot / $code
     req(isTRUE(res$ok), res$plot)
-    plotly::ggplotly(res$plot)             # add interactivity ourselves
+    plotly::ggplotly(res$plot)                                       # add interactivity ourselves
   })
 }
 ```
 
-## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
+. . .
 
-[Demo]{.eyebrow}
-
-[Embedding]{.big}
-
-[]{.rule}
-
-[Two modules, shared picker, plotly render]{.sub}
+**Demo**: two modules, shared placeholders, plotly render
 
 `shiny::runApp("demos/05-multimodule-plotly.R")`
 
-::: {.notes}
-Pre-launched tab. Show: one shared picker recolors both panels; hover/zoom on
-the plotly panel = calling app owns that render path.
-:::
 
 ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
 
@@ -608,15 +740,32 @@ Every draw, ggpaintr prints **runnable `ggplot2` code for the displayed plot** �
 every placeholder replaced by the concrete value it stood for.
 
 :::: {.columns}
-::: {.column width="50%"}
-![](images/repro_pcp_code.png){height="300"}
+::: {.column width="40%"}
+```r
+ggplot(
+  data = penguins |>
+    filter(!is.na(sex)) |>
+    pcp_select(
+      c("species", "island", 
+        "flipper_length_mm", 
+        "body_mass_g", "sex")
+    ) |>
+    pcp_scale(method = "std") |>
+    pcp_arrange(),
+  aes_pcp()
+) +
+  geom_pcp_axes() +
+  geom_pcp(aes(colour = species), 
+           alpha = 0.8, overplot = "none") +
+  geom_pcp_labels()
+```
 :::
-::: {.column width="50%"}
+::: {.column width="60%"}
 ![](images/repro_pcp_code_plot.png){height="300"}
 :::
 ::::
 
-Paste it into a clean R session → the **same plot**.
+Pasting it into a clean R session results in the **same plot**.
 
 ## Reload a previous state with `spec` {.smaller}
 
@@ -667,7 +816,7 @@ addresses an earlier step: how the **developer publishes** the formula-derived a
 ggpaintr lets the developer **pre-write a specific plot** — a third-party geom,
 `coord_polar()`, a multi-layer composition — and expose only chosen slots.
 
-## More examples to try {.smaller}
+## More examples to try
 
 - `demos/01-ggpcp-dashboard.R` — parallel coordinates + two custom placeholders
 - `demos/02-iris-explore.R` — the 4-line exploration app
@@ -679,7 +828,7 @@ ggpaintr lets the developer **pre-write a specific plot** — a third-party geom
 ggpaintr composes with `ggplot2` **extension packages**, data **pipelines**,
 **uploads**, and your **own render path** — not a fixed chart catalogue.
 
-## Limitations & future work {.smaller}
+## Limitations & future work
 
 **Limitations**
 
@@ -741,7 +890,7 @@ willju-wangqian.github.io/ggpaintr
 ::: {#refs}
 :::
 
-## Backup · The rlang machinery inside ggpaintr {.smaller visibility="uncounted"}
+## Backup · The rlang machinery inside ggpaintr {visibility="uncounted"}
 
 - **Capture.** The unquoted formula enters through `rlang::enexpr()`; the plain
   string fallback is parsed to the same expression.
@@ -756,7 +905,7 @@ willju-wangqian.github.io/ggpaintr
   upstream data mask*, so several local masks can be live in one formula —
   e.g. upstream vs downstream of a `summarise()`.
 
-## Backup · `ppExpr` and the denylist {.smaller visibility="uncounted"}
+## Backup · `ppExpr` and the denylist {visibility="uncounted"}
 
 - `ppExpr` is the only placeholder that accepts an **arbitrary R expression**:
   the app user types it, and the *host's* R session evaluates it.

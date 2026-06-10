@@ -80,6 +80,50 @@
   margin: 0;
 }
 
+/* ===================================================================
+   {.smaller} fix — the ISU theme sizes h2/p/li in absolute px, which
+   defeats Quarto's em-based .smaller (0.7em shrink + title
+   compensation calc(1.6em/0.7), which inflated titles to ~45px).
+   Pin titles at the theme's 30px and shrink body text for real.
+   =================================================================== */
+.reveal .slides section.smaller h2 {
+  font-size: 30px;
+}
+
+/* ===================================================================
+   Nested lists — reveal's base css re-enables a square marker on
+   ul ul (more specific than the theme's `.reveal ul`), so sub-items
+   showed both the square and the ISU chevron. Kill the native marker
+   and use a quieter taupe dash for sub-items.
+   =================================================================== */
+.reveal ul ul {
+  list-style: none !important;
+}
+.reveal ul ul li::before {
+  content: "–";
+  color: #524727;   /* taupe, quieter than cardinal */
+  font-weight: 400;
+}
+
+/* ===================================================================
+   .col-divider — vertical dashed line between columns.
+   Usage: :::: {.columns .col-divider}
+   =================================================================== */
+.reveal .columns.col-divider {
+  display: flex;            /* side-by-side, equal-height columns */
+  align-items: stretch;
+}
+.reveal .columns.col-divider > .column {
+  box-sizing: border-box;   /* keep padding+border inside the declared width */
+}
+.reveal .columns.col-divider > .column:not(:last-child) {
+  border-right: 2px dashed rgba(100, 100, 100, 0.45);
+  padding-right: 1.5%;
+}
+.reveal .columns.col-divider > .column + .column {
+  padding-left: 1.5%;
+}
+
 /* the runnable command, monospace on a faint dark chip */
 .reveal section.isu-section p code,
 .reveal section.isu-section .cmd {
