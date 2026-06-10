@@ -20,37 +20,6 @@ execute:
   eval: false
 ---
 
-## The idea in one line {.smaller}
-
-:::: {.columns .col-divider}
-::: {.column width="35%"}
-Ordinary R plotting code (`ggplot2`) for a scatterplot, with three values
-**embellished** as `ppVar(...)`.
-
-```r
-library(ggpaintr)
-
-ptr_app(
-  ggplot(iris,
-    aes(x = ppVar(Sepal.Length),
-        y = ppVar(Sepal.Width),
-        color = ppVar(Species))) +
-    geom_point()
-)
-```
-:::
-::: {.column width="65%"}
-The Shiny app that one expression becomes:
-
-![](images/annotated/annotated_iris_app.png){height="330"}
-:::
-::::
-
-. . .
-
-Each embellished value becomes exactly one control — `ggpaintr` generates the
-rest of the app.
-
 ## Outline
 
 - **Motivation** — why turn parts of a graphic into controls, and why that's harder than it should be
@@ -73,23 +42,12 @@ rest of the app.
 
 ## Motivation: two moments where a Shiny app is helpful
 
-- **Shiny dashboard**
-  - presenting a **finished** analysis in a Shiny app, with pre-defined and chosen controls exposed to users
-  - structured layout, navigation, sharing
 - **Exploration tool**
-  - visualizing data with different combination of variables quickly
-
-## Shiny dashboard
-
-A published parallel-coordinate plot of the penguins
-[@vanderplas2023penguins], built with `ggplot2` + `ggpcp`. Turn it into a
-dashboard: pick the axes, rescale, recolor.
-
-![](images/annotated/annotated_pcp_app.png){height="360" fig-align="center"}
-
-. . .
-
-`shiny::runApp("demos/01-ggpcp-dashboard.R")`
+  - visualize feature relationships quickly 
+  - enable diagnostic workflow 
+- **Shiny dashboard**
+  - present a **finished** analysis in a Shiny app, with pre-defined and chosen controls exposed to users
+  - structured layout, navigation, sharing
 
 ## Explore data {.smaller}
 
@@ -117,17 +75,19 @@ Re-typing the same call to change three slots is exactly where a widget should b
 
 . . .
 
-`shiny::runApp("demos/02-iris-explore.R")`
+`shiny::runApp("demos/01-iris-explore.R")`
 
-<!-- ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"} -->
+## Shiny dashboard
 
-<!-- [Demo]{.eyebrow} -->
+A published parallel-coordinate plot of the penguins
+[@vanderplas2023penguins], built with `ggplot2` + `ggpcp`. Turn it into a
+dashboard: pick the axes, rescale, recolor.
 
-<!-- [Scenario 2]{.big} -->
+![](images/ggpcp_published_figure.png){height="360" fig-align="center"}
 
-<!-- []{.rule} -->
+. . .
 
-<!-- [Three dropdowns: X, Y, Color]{.sub} -->
+`shiny::runApp("demos/02-ggpcp-dashboard.R")`
 
 
 ## Shiny code behind the iris app {.smaller .scrollable}
@@ -176,7 +136,7 @@ The obligations behind those 25 lines:
 Adding more layers to the graphic requires more control widgets
 
 - For example, add a title, facet, and smoothing method
-- each new control multiplies all of this
+- each new control requires both `UI` and `server` code 
 :::
 
 ## Reproduce the same app with ggpaintr {.smaller}
@@ -239,8 +199,8 @@ Added controls:
 
 ## Motivation
 
-- **dashboard**: fast prototype with core visualization implemented
 - **exploration**: explore right away without writing Shiny code
+- **dashboard**: fast prototype with core visualization implemented
 
 . . .
 
@@ -945,3 +905,33 @@ willju-wangqian.github.io/ggpaintr
   **not a security boundary** — known-dangerous calls are blocked, but
   untrusted input can evade it; an outside-facing deployment needs its own
   trust boundary.
+
+
+<!-- ## The idea in one line {.smaller} -->
+
+<!-- :::: {.columns .col-divider} -->
+<!-- ::: {.column width="35%"} -->
+<!-- Ordinary R plotting code (`ggplot2`) for a scatterplot, with three values -->
+<!-- **embellished** as `ppVar(...)`. -->
+
+<!-- library(ggpaintr) -->
+
+<!-- ptr_app( -->
+<!--   ggplot(iris, -->
+<!--     aes(x = ppVar(Sepal.Length), -->
+<!--         y = ppVar(Sepal.Width), -->
+<!--         color = ppVar(Species))) + -->
+<!--     geom_point() -->
+<!-- ) -->
+<!-- ::: -->
+<!-- ::: {.column width="65%"} -->
+<!-- The Shiny app that one expression becomes: -->
+
+<!-- ![](images/annotated/annotated_iris_app.png){height="330"} -->
+<!-- ::: -->
+<!-- :::: -->
+
+<!-- . . . -->
+
+<!-- Each embellished value becomes exactly one control — `ggpaintr` generates the -->
+<!-- rest of the app. -->

@@ -19,8 +19,13 @@ ppVars <- ptr_define_placeholder_consumer(
   keyword = "ppVars",
   build_ui = function(node, cols, data, label = NULL, selected = NULL, ...) {
     retained <- intersect(selected %||% character(0), cols)
-    selectInput(node$id, label = label %||% "Columns",
-                choices = cols, selected = retained, multiple = TRUE)
+
+    selectizeInput(node$id, label = label %||% "Columns",
+                   choices = union(retained, cols), selected = retained, multiple = TRUE,
+                   options = list(plugins = list("drag_drop")))
+
+    # selectInput(node$id, label = label %||% "Columns",
+    #             choices = cols, selected = retained, multiple = TRUE)
   },
   resolve_expr = function(value, node, ...) {
     if (length(value) == 0L) return(NULL)
@@ -52,6 +57,15 @@ ppScaleMethod <- ptr_define_placeholder_value(
   parse_positional_arg = ptr_arg_string(),
   ui_text_defaults = list(label = "Scaling method for {param}")
 )
+
+#
+# oranges <- c("#FDBF6F", "#F89D38", "#F37A00")
+# purples <- c("#CAB2D6", "#9A78B8", "#6A3D9A")
+# greens <- c("#b2df8a", "#73C05B", "#33a02c")
+#
+# cols <-  c(oranges[2], greens[2], purples[2])
+
+
 
 # --- one formula -> the whole dashboard --------------------------------------
 ptr_app(
