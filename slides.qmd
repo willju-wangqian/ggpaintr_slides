@@ -255,9 +255,16 @@ Added controls:
 
 [Background]{.big}
 
-[]{.rule}
+<!-- []{.rule} -->
 
-[Shiny, the grammar of graphics, lazy & tidy evaluation]{.sub}
+<!-- [Shiny, the grammar of graphics, lazy & tidy evaluation]{.sub} -->
+
+## Background
+
+- Shiny app
+- The grammar of graphics and `ggplot2`
+- Lazy evaluation and metaprogramming in R
+- Tidy evaluation and data masking
 
 ## Shiny apps
 
@@ -426,9 +433,15 @@ Similarly, we have
 
 [Design]{.big}
 
-[]{.rule}
+<!-- []{.rule} -->
 
-[Placeholders, embellishment, and interactive masking]{.sub}
+<!-- [Placeholders, embellishment, and interactive masking]{.sub} -->
+
+## Design
+
+- Placeholders: five default placeholders and three roles
+- Embellishment: what and why
+- Interactive masking
 
 ## Placeholders {.smaller}
 
@@ -556,9 +569,17 @@ filled-in tree** — they agree *by construction.*
 
 [Extensibility]{.big}
 
-[]{.rule}
+<!-- []{.rule} -->
 
-[Custom placeholders, embedding, sharing, your own render path]{.sub}
+<!-- [Custom placeholders, embedding, sharing, your own render path]{.sub} -->
+
+## Extensibility
+
+- Custom placeholders
+- Embed `ggpaintr` in **your own** Shiny app
+- Multiple `ggpaintr` instances in one session
+- Multiple placeholders sharing the same widget (linking placeholders)
+- Custom rendering path
 
 ## Custom placeholder --- the vocabulary is open {.smaller}
 
@@ -730,14 +751,18 @@ server <- function(input, output, session) {
 
 [Reproducibility]{.big}
 
-[]{.rule}
+<!-- []{.rule} -->
 
-[The code panel, and saved states with spec]{.sub}
+<!-- [The code panel, and saved states with spec]{.sub} -->
+
+## Reproducibility
+
+- code panel
+- `spec` (specification, current user's input widget values)
 
 ## The code panel {.smaller}
 
-Every draw, ggpaintr prints **runnable `ggplot2` code for the displayed plot** —
-every placeholder replaced by the concrete value it stood for.
+`ggpaintr` returns **runnable `ggplot2` code for the displayed plot** 
 
 :::: {.columns}
 ::: {.column width="40%"}
@@ -767,9 +792,14 @@ ggplot(
 
 Pasting it into a clean R session results in the **same plot**.
 
+## Reproducibility path
+
+![](images/ggpaintr_mechanism.png){height="380"}
+
+
 ## Reload a previous state with `spec` {.smaller}
 
-The code panel can switch from final code to a **spec view** — a list of the
+The code panel can switch from final code to a **spec view** --- a list of the
 current widget values:
 
 ```r
@@ -781,10 +811,9 @@ ptr_spec <- list(
 ```
 
 - Pass that block back as the `spec` argument:
-  `ptr_app(formula, spec = ptr_spec)` — it **seeds every widget at startup**.
-- The app **reopens in that exact state** — like how embellishment seeds widgets
-  from the literal defaults in the formula.
-- Each spec is independent → save **several finished states** and reopen any of them.
+  `ptr_app(formula, spec = ptr_spec)` --- it **seeds every widget at startup**
+- The app **reopens in that exact state** — values in `spec` are used as the default values
+- Each spec is independent --> save **several finished states** and reopen any of them.
 
 ## &nbsp; {.isu-section background-image="assets/campus.jpg" background-size="cover"}
 
@@ -798,8 +827,8 @@ ptr_spec <- list(
 
 ## Compared with other tools {.smaller}
 
-Most tools serve a user **constructing** a chart through a GUI. ggpaintr
-addresses an earlier step: how the **developer publishes** the formula-derived app.
+Most tools serve a user constructing **a chart** through a GUI. `ggpaintr`
+serves a user constructing **their own Shiny app**. 
 
 | Tool | Authoring interface | Reproducible artifact | Embeddable? |
 |---|---|---|---|
@@ -812,57 +841,55 @@ addresses an earlier step: how the **developer publishes** the formula-derived a
 
 . . .
 
-**vs. esquisse** (closest neighbor): esquisse offers a chart-authoring menu;
-ggpaintr lets the developer **pre-write a specific plot** — a third-party geom,
-`coord_polar()`, a multi-layer composition — and expose only chosen slots.
+**vs. esquisse** (closest neighbor): `esquisse` offers a chart-authoring menu and shows high level of flexibility. But still, it is not used for generating shiny apps
 
 ## More examples to try
 
 - `demos/01-ggpcp-dashboard.R` — parallel coordinates + two custom placeholders
 - `demos/02-iris-explore.R` — the 4-line exploration app
-- `demos/03-penguins-demo.R` — the full value/consumer showcase
+- `demos/03-iris-penguins-demo.R` — the full value/consumer showcase
 - `demos/04-iris-handwritten-shiny.R` — the same app, written by hand (the cost)
 - `demos/05-multimodule-plotly.R` — embed + shared + own plotly render
 - `demos/06-custom-placeholder.R` — the smallest custom placeholder
+- `demos/07-iris-penguins-pca-demo.R` – PCA on `iris` and `penguins` data
+- `demos/08-ppExpr-demo.R` – `ppExpr` demonstration
 
-ggpaintr composes with `ggplot2` **extension packages**, data **pipelines**,
+`ggpaintr` composes with `ggplot2` **extension packages**, data **pipelines**,
 **uploads**, and your **own render path** — not a fixed chart catalogue.
 
 ## Limitations & future work
 
 **Limitations**
 
-- Reproducibility stops at what the artifacts record: the app reproduces given
-  the **same ggpaintr version** and any **custom-placeholder registrations**
-  (those live outside the formula text); the code panel does **not** capture
-  the uploaded data frame, package versions, or transformations the calling
-  app applies *after* ggpaintr hands the object back.
-- The **denylist** on `ppExpr` is a safety check for the trusted developer/user
-  workflow — **not** a security boundary. A deployment taking formulas from
-  outside parties must add its own trust boundary.
+- Reproducibility stops at what the artifacts record: 
+  - the app reproduces given the **same ggpaintr version** and any **custom-placeholder registrations** (those live outside the formula text) 
+  - the code panel does **not** capture package versions or transformations the calling app applies *after* ggpaintr hands the object back.
+- The **denylist** on `ppExpr` is a safety check for the trusted developer/user workflow — **not** a security boundary. A deployment taking formulas from outside parties must add its own trust boundary.
 
-. . .
+## Limitations & future work
 
-**Future work**
+**Language models**
 
-- **Language models.** `ptr_llm_primer()` / `ptr_llm_topic()` /
-  `ptr_llm_register()` brief a model (via `ellmer`) so it answers with a
-  **formula**, not a whole app — one short line to read instead of `ui`/`server`
-  scaffolding to audit. Shipped, but whether it measurably improves assistant
-  reliability is an **open empirical question**.
-- A CRAN release, and a community collection of registered placeholders
-  (date pickers, color pickers, multi-handle sliders).
+- Powerful large Language models can output Shiny apps directly
+  - deterministic vs random
+  - high quality outputs need "plan, implement, verify, (and maintain)"
+- Complementary, not competing
+  - `ptr_llm_primer()` / `ptr_llm_topic()` / `ptr_llm_register()`
+  - teach an LLM how to use `ggpaintr`
+  - whether it measurably improves LLM reliability might need future work
 
-## Takeaways
+CRAN release, ggpaintr ebook, and more custom placeholders from community
 
-- One `ggplot2`-style **formula** → a running Shiny app **+** reproducible code,
-  with no UI↔server wiring.
-- **Placeholders** turn slots into widgets; **embellishment** keeps the formula
-  valid plain R.
-- The engine is **interactive masking**: defer which data *and* which
-  expression runs, resolved against the live session on each draw.
-- **Extensible** (custom placeholders, embedding, sharing, own render) and
-  **reproducible** (code panel + `spec`).
+<!-- ## Takeaways -->
+
+<!-- - One `ggplot2`-style **formula** → a running Shiny app **+** reproducible code, -->
+<!--   with no UI↔server wiring. -->
+<!-- - **Placeholders** turn slots into widgets; **embellishment** keeps the formula -->
+<!--   valid plain R. -->
+<!-- - The engine is **interactive masking**: defer which data *and* which -->
+<!--   expression runs, resolved against the live session on each draw. -->
+<!-- - **Extensible** (custom placeholders, embedding, sharing, own render) and -->
+<!--   **reproducible** (code panel + `spec`). -->
 
 ## Thank you {.contact}
 
