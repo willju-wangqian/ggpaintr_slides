@@ -139,26 +139,26 @@ Adding more layers to the graphic requires more control widgets
 - each new control requires both `UI` and `server` code 
 :::
 
-## Reproduce the same app with ggpaintr {.smaller}
+
+## Reproduce the same app with ggpaintr 
+
+App layout:
+
+![](images/annotated/annotated_iris_app.png){width="80%" fig-align="center"}
+
+## Reproduce the same app with ggpaintr 
 
 The same app — one `ptr_app()` call:
 
-:::: {.columns .col-divider}
-::: {.column width="45%"}
 ```{.r code-line-numbers="1,3-5"}
-ptr_app(
+ptr_app(                                 # make an app based on this formula
   ggplot(iris, aes(
-    x = ppVar(Sepal.Length),
-    y = ppVar(Sepal.Width),
-    color = ppVar(Species))) +
+    x = ppVar(Sepal.Length),             # a picker for x-axis, default Sepal.Length
+    y = ppVar(Sepal.Width),              # a picker for y-axis, default Sepal.Width
+    color = ppVar(Species))) +           # a picker for color, default Species
     geom_point()
 )
 ```
-:::
-::: {.column width="55%"}
-![](images/annotated/annotated_iris_app.png){height="250"}
-:::
-::::
 
 
 ## iris app with more controls {.smaller}
