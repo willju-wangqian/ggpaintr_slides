@@ -11,10 +11,6 @@ contributes:
       margin: 0
       slide-number: c
       footer: "Unit or Department Name Here"
-      title-slide-attributes:
-        data-background-image: assets/campus.jpg
-        data-background-size: cover
-        data-background-position: center
       highlight-style: github
       menu: false
       chalkboard: false
